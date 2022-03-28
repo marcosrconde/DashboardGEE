@@ -1,12 +1,12 @@
 Package: DashboardGEE
-Title: Ferramenta de cálculo de emissões de GEE
+Title: GEE Calc
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "firstname",
-           family = "lastname",
+    person(given = "Marcos",
+           family = "Conde",
            role = c("aut", "cre"),
-           email = "your@email.com")
-Description: What the package does (one paragraph).
+           email = "marcos.conde@epe.gov.br")
+Description: Ferramenta de cálculo de emissões de GEE
 License: What license is it under?
 Imports: 
     config (>= 0.3.1),
