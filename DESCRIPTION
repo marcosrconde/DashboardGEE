@@ -1,5 +1,5 @@
 Package: DashboardGEE
-Title: An Amazing Shiny App
+Title: Ferramenta de cálculo de emissões de GEE
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "firstname",
@@ -11,7 +11,24 @@ License: What license is it under?
 Imports: 
     config (>= 0.3.1),
     golem (>= 0.3.2),
-    shiny (>= 1.7.1)
+    shiny (>= 1.7.1),
+    readxl,
+    tidyverse,
+    data.table,
+    splitstackshape,
+    janitor,
+    ggplot2,
+    scales,
+    rhandsontable,
+    DT,
+    shinythemes,
+    shinydashboard,
+    shinydashboardPlus,
+    shinyWidgets,
+    plotly
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
