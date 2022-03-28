@@ -773,7 +773,7 @@ calcula <- function(){
     "Alcatrão")
 
   combustivel_CH4[,1] <- c(nomes_combustiveis_CH4, "Total")
-  combustivel_CH4[,2:12] <- combustivel_CH4[,2:12]*1000
+  combustivel_CH4[,2:n_colunas] <- combustivel_CH4[,2:n_colunas]*1000
   combustivel_CH4[,2:n_colunas]  <- combustivel_CH4[,2:n_colunas] %>%
     round(digits = 1)
 
@@ -812,7 +812,7 @@ calcula <- function(){
     "Alcatrão")
 
   combustivel_N2O[,1] <- c(nomes_combustiveis_N2O, "Total")
-  combustivel_N2O[,2:12] <- combustivel_N2O[,2:12]*1000
+  combustivel_N2O[,2:n_colunas] <- combustivel_N2O[,2:n_colunas]*1000
   combustivel_N2O[,2:n_colunas]  <- combustivel_N2O[,2:n_colunas] %>%
     round(digits = 1)
 
@@ -865,7 +865,7 @@ calcula <- function(){
     "As emissões foram calculadas. Acesse as páginas de resultado no menu à esquerda."
   ))
 
-  resultado <<- list(
+  resultado <- list(
     CO2_final = CO2_final,
     combustivel_CO2 = combustivel_CO2,
     CO2_grafico = CO2_grafico,
