@@ -7,7 +7,8 @@
 app_server <- function(input, output, session) {
   # Your application server logic
 
-   observeEvent(input$calcula, {
+
+    observeEvent(input$calcula, {
 
     arquivo <- input$entrada
 
@@ -28,6 +29,9 @@ app_server <- function(input, output, session) {
       txt_unidade <- "Milhões de toneladas de CO2"
       tabela_setores <- resultado$CO2_final
       tabela_comb <- resultado$combustivel_CO2
+      tabela_fugitivas <- resultado$fugitivas_co2_trans
+      tabela_intensidade <- resultado$intensidade_co2eq
+      tabela_industrial <- resultado$CO2_industrial_trans
       grafico_exibir <- resultado$CO2_grafico
       grafico_comb <- resultado$combustivel_CO2
       n_comb_outros <- 8}
@@ -35,6 +39,9 @@ app_server <- function(input, output, session) {
       txt_unidade <- "Mil toneladas de CH4"
       tabela_setores <- resultado$CH4_final
       tabela_comb <- resultado$combustivel_CH4
+      tabela_fugitivas <- resultado$fugitivas_ch4_trans
+      tabela_intensidade <- resultado$intensidade_co2eq
+      tabela_industrial <- resultado$CH4_industrial_trans
       grafico_exibir <- resultado$CH4_grafico
       grafico_comb <- resultado$combustivel_CH4
       n_comb_outros <- 12}
@@ -42,6 +49,9 @@ app_server <- function(input, output, session) {
       txt_unidade <- "Mil toneladas de N2O"
       tabela_setores <- resultado$N2O_final
       tabela_comb <- resultado$combustivel_N2O
+      tabela_fugitivas <- resultado$fugitivas_n2o_trans
+      tabela_intensidade <- resultado$intensidade_co2eq
+      tabela_industrial <- resultado$N2O_industrial_trans
       grafico_exibir <- resultado$N2O_grafico
       grafico_comb <- resultado$combustivel_N2O
       n_comb_outros <- 12}
@@ -49,6 +59,9 @@ app_server <- function(input, output, session) {
       txt_unidade <- "Milhões de toneladas de CO2eq"
       tabela_setores <- resultado$CO2eq_final
       tabela_comb <- resultado$combustivel_CO2eq
+      tabela_fugitivas <- resultado$total_fugitivas_CO2eq
+      tabela_intensidade <- resultado$intensidade_co2eq
+      tabela_industrial <- resultado$CO2eq_industrial_trans
       grafico_exibir <- resultado$CO2eq_grafico
       grafico_comb <- resultado$combustivel_CO2eq
       n_comb_outros <- 12}
@@ -57,33 +70,132 @@ app_server <- function(input, output, session) {
         sliderInput("ano_selecionado", "Selecione o ano a exibir:", min = ano_inicio, max = ano_fim, value = ano_inicio, step = 1, ticks = FALSE)
       })
 
-    output$unidade_setores <- renderText(txt_unidade)
-    output$unidade_comb <- renderText(txt_unidade)
+    output$tabela_setores <- renderUI({
 
-    output$tabela_DT_setores <- renderDT({
+      selecao_tabelas <- input$select_tabelas
 
-      datatable(tabela_setores, rownames = FALSE,
+      if('Emissões por setor' %in% selecao_tabelas) {
+      box(title = "Resultados por setor", width = 12,
+          renderDT({
+            datatable(tabela_setores, rownames = FALSE,
+                                 options = list(
+                                   pageLength = 12,
+                                   dom = 'rtip',
+                                   scrollX = TRUE,
+                                   searching = FALSE)
+                                 ) %>%
+                         formatStyle(0, target = 'row', lineHeight = '70%', fontSize = '80%')
+            }))}
+      })
+
+    output$tabela_combustiveis <- renderUI({
+
+      selecao_tabelas <- input$select_tabelas
+
+      if("Emissões por combustível" %in% selecao_tabelas){
+
+      box(title = "Resultados por combustível", width = 12,
+      renderDT({
+         datatable(tabela_comb, rownames = FALSE,
                 options = list(
-                  buttons = c('excel'),
-                  pageLength = 12,
-                  dom = 'Bfrtip',
-                  scrollX = TRUE,
-                  searching = FALSE),
-                extensions = 'Buttons')%>%
-        formatStyle(0, target = 'row', lineHeight = '70%', fontSize = '80%')
-    })
-
-    output$tabela_DT_combustiveis <- renderDT({
-
-      datatable(tabela_comb, rownames = FALSE,
-                options = list(
-                  buttons = c('excel'),
                   pageLength = 19,
-                  dom = 'Bfrtip',
-                  scrollX = TRUE),
-                extensions = 'Buttons') %>%
+                  dom = 'tip',
+                  scrollX = TRUE)
+                ) %>%
         formatStyle(0, target = 'row', lineHeight = '70%', fontSize = '80%')
+    }))
+    }
+  })
+
+    output$tabela_fugitivas <- renderUI({
+
+      selecao_tabelas <- input$select_tabelas
+
+      n_colunas <- ncol(tabela_fugitivas)
+
+      if("Emissões fugitivas" %in% selecao_tabelas){
+
+        box(title = "Emissões fugitivas", width = 12,
+            renderDT({
+              datatable(tabela_fugitivas, rownames = FALSE,
+                        options = list(
+                          columnDefs = list(list(className = 'dt-right', targets = 1:(n_colunas-1))),
+                          dom = 'tip',
+                          scrollX = TRUE)
+                        ) %>%
+                formatStyle(0, target = 'row', lineHeight = '70%', fontSize = '80%') %>%
+                formatRound(., columns = 2:n_colunas, digits = 2, mark = '.', dec.mark = ',', interval = 3)
+            }))
+      }
     })
+
+    output$tabela_intensidade <- renderUI({
+
+      selecao_tabelas <- input$select_tabelas
+
+      names(tabela_intensidade) <- c('Ano', 'OIE (mil tep)', 'Emissão (t.CO2eq)', 'Intensidade (kg.CO2eq/tep)')
+
+      if("Intensidade de emissões na OIE" %in% selecao_tabelas){
+
+        box(title = "Intensidade de emissões na oferta interna de energia", width = 12,
+            renderDT({
+              datatable(tabela_intensidade, rownames = FALSE,
+                        options = list(
+                          columnDefs = list(list(className = "dt-left", targets = 0)),
+                          paging = FALSE,
+                          dom = 'tip',
+                          scrollY = TRUE,
+                          scrollX = TRUE)
+                          ) %>%
+                formatStyle(0, target = 'row', lineHeight = '70%', fontSize = '80%') %>%
+                formatStyle(., columns = 1, `text-align` = "left") %>%
+                formatRound(., columns = 2:4, digits = 2, mark = ".", dec.mark = ",", interval = 3)
+            }))
+      }
+    })
+
+    output$tabela_industrias <- renderUI({
+
+      selecao_tabelas <- input$select_tabelas
+
+      n_colunas <- ncol(tabela_industrial)
+
+      if('Setor industrial' %in% selecao_tabelas) {
+        box(title = "Detalhamento: Setor industrial", width = 12,
+            renderDT({
+              datatable(tabela_industrial, rownames = FALSE,
+                        options = list(
+                          pageLength = 12,
+                          dom = 'tip',
+                          scrollX = TRUE,
+                          searching = FALSE)
+                        ) %>%
+                formatStyle(0, target = 'row', lineHeight = '70%', fontSize = '80%') %>%
+                formatRound(., columns = 2:n_colunas, digits = 2, interval = 3, mark = '.', dec.mark = ',')
+            }))}
+    })
+
+    output$unidade_setores <- renderText(txt_unidade)
+
+    output$texto_unidade <- renderUI({
+
+      selecao_tabelas <- input$select_tabelas
+
+      if(!is.null(selecao_tabelas)){
+        span("Exibindo: ", input$tipo_gas, br(), div(style = 'display: inline-block;', h5("Unidade: ")),
+             div(style = 'display: inline-block;', h5(textOutput("unidade_setores"))))
+      }
+    })
+
+    output$download_button <- renderUI({
+      if (status == 'rodado') {
+        downloadButton(outputId = 'download_excel', label = "Exportar resultados para Excel")
+      }
+    })
+
+    output$download_excel <- downloadHandler(filename = 'resultados.xlsx',
+                                             content = function(arquivo){file.copy('resultados.xlsx', arquivo)},
+                                             contentType = 'xlsx')
 
     max_eixo_y <- tabela_setores %>%
       select(

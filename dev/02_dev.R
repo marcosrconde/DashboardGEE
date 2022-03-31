@@ -25,7 +25,7 @@ golem::add_module(name = "name_of_module2", with_test = TRUE) # Name of the modu
 ## Add helper functions ----
 ## Creates fct_* and utils_*
 golem::add_fct("calcula", with_test = TRUE)
-golem::add_utils("auxiliar", with_test = TRUE)
+golem::add_utils("exportar", with_test = TRUE)
 
 ## External resources
 ## Creates .js and .css files at inst/app/www

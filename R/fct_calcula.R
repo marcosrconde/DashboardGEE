@@ -1,9 +1,16 @@
 #' calcula
 #'
-#' @description A fct function
-#'
-#' @return The return value, if any, from executing the function.
-#'
+#' @description
+#' Calcula as emissões de gases de efeito estufa a partir da matriz
+#'consolidada produzida pela SEE em formato excel. A função primeiramente organiza
+#'as informações da planilha em um dataframe e depois procede os cálculos, gerando
+#'tabelas úteis para análises dos resultados.
+#' O arquivo excel é importado após o usuário clicar no botão calcular - código
+#'de importação no script app_server.R.
+#' Os fatores de emissão são importados no script global.R
+#' @return
+#'Retorna uma lista com as tabelas úteis para análises das emissões de GEE nos
+#'planos de energia
 #' @noRd
 
 
@@ -253,11 +260,11 @@ calcula <- function(){
   fugitivas_ch4_GWP <- mutate_if(fugitivas_ch4_trans, is.numeric, ~ . * GWP_AR5_CH4/1000)
   fugitivas_n2o_GWP <- mutate_if(fugitivas_n2o_trans, is.numeric, ~ . * GWP_AR5_N2O/1000)
 
-  total_fugitivas_CO2eq <- rbind(fugitivas_co2_trans[5,],fugitivas_ch4_GWP[5,],fugitivas_n2o_GWP[4,]) %>%
-    mutate(setores = c("CO2", "CH4", "N2O")) %>%
-    bind_rows(summarise(.,
-                        across(where(is.numeric), sum),
-                        across(where(is.character), ~"Emissões Fugitivas")))
+  total_fugitivas_CO2eq <- rbind(fugitivas_co2_trans, fugitivas_ch4_GWP, fugitivas_n2o_GWP) %>%
+    group_by(setores) %>%
+    summarise(., across(where(is.numeric), sum))
+
+  total_fugitivas_CO2eq <- total_fugitivas_CO2eq[c(2,4,5,1,3),]
 
   fugitivas_co2_grafico <- fugitivas_co2 %>%
     select(., 'ano', 'Total') %>%
@@ -334,6 +341,43 @@ calcula <- function(){
     mutate(setores = "industrial") %>%
     relocate(., 'setores', .before = 'Total')
 
+  # Prepara tabela com emissões do setor industrial para apresentação final
+
+  CO2_industrial_trans <- CO2 %>%
+    subset(.,setores == 'cimento'|
+             setores == 'ferro_gusa_e_aco'|
+             setores == 'ferroligas'|
+             setores == 'mineracao_e_pelotizacao'|
+             setores == 'nao_ferrosos'|
+             setores == 'quimica'|
+             setores == 'alimentos_e_bebidas'|
+             setores == 'textil'|
+             setores == 'papel_e_celulose'|
+             setores == 'ceramica'|
+             setores == 'outros'
+             ) %>%
+    group_by(ano, setores) %>%
+    summarise(., Total = sum(Total)) %>%
+    pivot_wider(., names_from = ano, values_from = Total) %>%
+    adorn_totals(., where = 'row')
+
+  CO2_industrial_trans[,1] <- c(
+    'Alimentos e bebidas',
+    'Cerâmica',
+    'Cimento',
+    'Ferro gusa e aço',
+    'Ferroligas',
+    'Mineração e pelotização',
+    'Não ferrosos',
+    'Outros',
+    'Papel e celulose',
+    'Química',
+    'Têxtil',
+    'Total'
+  )
+
+  CO2_industrial_trans <- CO2_industrial_trans[c(1:7,9:11,8,12),]
+
   CO2_parcial<- CO2 %>%
     subset(.,
            setores == 'comercial'|
@@ -364,7 +408,7 @@ calcula <- function(){
   CO2_final <- CO2_final[c(2,3,7,6,4,5,1,8,9,10),] %>%
     adorn_totals(c("row"))
 
-  CO2_final_num <- round(CO2_final[ ,2:n_colunas], digits = 1)
+  CO2_final_num <- round(CO2_final[ ,2:n_colunas], digits = 2)
 
   CO2_final <- cbind(Setores_formatado, CO2_final_num) %>%
     rename(
@@ -416,6 +460,43 @@ calcula <- function(){
     mutate(setores = "industrial") %>%
     relocate(., 'setores', .before = 'Total')
 
+  # Prepara tabela com emissões do setor industrial para apresentação final
+
+  CH4_industrial_trans <- CH4 %>%
+    subset(.,setores == 'cimento'|
+             setores == 'ferro_gusa_e_aco'|
+             setores == 'ferroligas'|
+             setores == 'mineracao_e_pelotizacao'|
+             setores == 'nao_ferrosos'|
+             setores == 'quimica'|
+             setores == 'alimentos_e_bebidas'|
+             setores == 'textil'|
+             setores == 'papel_e_celulose'|
+             setores == 'ceramica'|
+             setores == 'outros'
+    ) %>%
+    group_by(ano, setores) %>%
+    summarise(., Total = sum(Total)) %>%
+    pivot_wider(., names_from = ano, values_from = Total) %>%
+    adorn_totals(., where = 'row')
+
+  CH4_industrial_trans[,1] <- c(
+    'Alimentos e bebidas',
+    'Cerâmica',
+    'Cimento',
+    'Ferro gusa e aço',
+    'Ferroligas',
+    'Mineração e pelotização',
+    'Não ferrosos',
+    'Outros',
+    'Papel e celulose',
+    'Química',
+    'Têxtil',
+    'Total'
+  )
+
+  CH4_industrial_trans <- CH4_industrial_trans[c(1:7,9:11,8,12),]
+
   CH4_energetico <- CH4 %>%
     subset(.,
            setores == 'setor_energetico'|
@@ -457,7 +538,7 @@ calcula <- function(){
   CH4_final <- CH4_final[c(3,2,8,6,4,5,1,7,9,10),] %>%
     adorn_totals(c("row"))
 
-  CH4_final_num <- round(CH4_final[ ,2:n_colunas], digits = 1)
+  CH4_final_num <- round(CH4_final[ ,2:n_colunas], digits = 2)
 
   CH4_final <- cbind(Setores_formatado, CH4_final_num) %>%
     rename(
@@ -509,6 +590,43 @@ calcula <- function(){
     mutate(setores = "industrial") %>%
     relocate(., 'setores', .before = 'Total')
 
+  # Prepara tabela com emissões do setor industrial para apresentação final
+
+  N2O_industrial_trans <- N2O %>%
+    subset(.,setores == 'cimento'|
+             setores == 'ferro_gusa_e_aco'|
+             setores == 'ferroligas'|
+             setores == 'mineracao_e_pelotizacao'|
+             setores == 'nao_ferrosos'|
+             setores == 'quimica'|
+             setores == 'alimentos_e_bebidas'|
+             setores == 'textil'|
+             setores == 'papel_e_celulose'|
+             setores == 'ceramica'|
+             setores == 'outros'
+    ) %>%
+    group_by(ano, setores) %>%
+    summarise(., Total = sum(Total)) %>%
+    pivot_wider(., names_from = ano, values_from = Total) %>%
+    adorn_totals(., where = 'row')
+
+  N2O_industrial_trans[,1] <- c(
+    'Alimentos e bebidas',
+    'Cerâmica',
+    'Cimento',
+    'Ferro gusa e aço',
+    'Ferroligas',
+    'Mineração e pelotização',
+    'Não ferrosos',
+    'Outros',
+    'Papel e celulose',
+    'Química',
+    'Têxtil',
+    'Total'
+  )
+
+  N2O_industrial_trans <- N2O_industrial_trans[c(1:7,9:11,8,12),]
+
   N2O_energetico <- N2O %>%
     subset(.,
            setores == 'setor_energetico'|
@@ -550,7 +668,7 @@ calcula <- function(){
   N2O_final <- N2O_final[c(3,2,8,6,4,5,1,7,9,10),] %>%
     adorn_totals(c("row"))
 
-  N2O_final_num <- round(N2O_final[ ,2:n_colunas], digits = 1)
+  N2O_final_num <- round(N2O_final[ ,2:n_colunas], digits = 2)
 
   N2O_final <- cbind(Setores_formatado, N2O_final_num) %>%
     rename(
@@ -605,6 +723,42 @@ calcula <- function(){
     mutate(setores = "industrial") %>%
     relocate(., 'setores', .before = 'Total')
 
+  # Prepara tabela com emissões do setor industrial para apresentação final
+
+  CO2eq_industrial_trans <- CO2eq %>%
+    subset(.,setores == 'cimento'|
+             setores == 'ferro_gusa_e_aco'|
+             setores == 'ferroligas'|
+             setores == 'mineracao_e_pelotizacao'|
+             setores == 'nao_ferrosos'|
+             setores == 'quimica'|
+             setores == 'alimentos_e_bebidas'|
+             setores == 'textil'|
+             setores == 'papel_e_celulose'|
+             setores == 'ceramica'|
+             setores == 'outros'
+    ) %>%
+    group_by(ano, setores) %>%
+    summarise(., Total = sum(Total)) %>%
+    pivot_wider(., names_from = ano, values_from = Total) %>%
+    adorn_totals(., where = 'row')
+
+  CO2eq_industrial_trans[,1] <- c(
+    'Alimentos e bebidas',
+    'Cerâmica',
+    'Cimento',
+    'Ferro gusa e aço',
+    'Ferroligas',
+    'Mineração e pelotização',
+    'Não ferrosos',
+    'Outros',
+    'Papel e celulose',
+    'Química',
+    'Têxtil',
+    'Total'
+  )
+
+  CO2eq_industrial_trans <- CO2eq_industrial_trans[c(1:7,9:11,8,12),]
 
   CO2eq_energetico <- CO2eq %>%
     subset(.,
@@ -650,7 +804,7 @@ calcula <- function(){
   CO2eq_final <- CO2eq_final[c(3,2,8,6,4,5,1,7,9,10),] %>%
     adorn_totals(c("row"))
 
-  CO2_eq_final_num <- round(CO2eq_final[ ,2:n_colunas], digits = 1)
+  CO2_eq_final_num <- round(CO2eq_final[ ,2:n_colunas], digits = 2)
 
   CO2eq_final <- cbind(Setores_formatado, CO2_eq_final_num) %>%
     rename(
@@ -736,7 +890,7 @@ calcula <- function(){
 
   combustivel_CO2[,1] <- c(nomes_combustiveis, "Total")
   combustivel_CO2[,2:n_colunas]  <- combustivel_CO2[,2:n_colunas] %>%
-    round(digits = 1)
+    round(digits = 2)
 
   # Matriz de combustível para emissão de CH4
 
@@ -775,7 +929,7 @@ calcula <- function(){
   combustivel_CH4[,1] <- c(nomes_combustiveis_CH4, "Total")
   combustivel_CH4[,2:n_colunas] <- combustivel_CH4[,2:n_colunas]*1000
   combustivel_CH4[,2:n_colunas]  <- combustivel_CH4[,2:n_colunas] %>%
-    round(digits = 1)
+    round(digits = 2)
 
   # Matriz de combustível para emissão de N2O
 
@@ -814,7 +968,7 @@ calcula <- function(){
   combustivel_N2O[,1] <- c(nomes_combustiveis_N2O, "Total")
   combustivel_N2O[,2:n_colunas] <- combustivel_N2O[,2:n_colunas]*1000
   combustivel_N2O[,2:n_colunas]  <- combustivel_N2O[,2:n_colunas] %>%
-    round(digits = 1)
+    round(digits = 2)
 
 
   # Matriz de combustível para emissão em CO2eq - GWP AR5
@@ -856,7 +1010,10 @@ calcula <- function(){
 
   combustivel_CO2eq[,1] <- c(nomes_combustiveis_CO2eq, "Total")
   combustivel_CO2eq[,2:n_colunas]  <- combustivel_CO2eq[,2:n_colunas] %>%
-    round(digits = 1)
+    round(digits = 2)
+
+
+# Emite mensagem de sucesso ---------------------------------------------------------
 
   showModal(modalDialog(
     title = "Sucesso!",
@@ -864,6 +1021,9 @@ calcula <- function(){
     size = "s",
     "As emissões foram calculadas. Acesse as páginas de resultado no menu à esquerda."
   ))
+
+
+# Constrói lista de resultado final ---------------------------------------
 
   resultado <- list(
     CO2_final = CO2_final,
@@ -878,8 +1038,24 @@ calcula <- function(){
     CO2eq_final = CO2eq_final,
     combustivel_CO2eq = combustivel_CO2eq,
     CO2eq_grafico = CO2eq_grafico,
-    intensidade_co2eq = intensidade_co2eq
+    intensidade_co2eq = intensidade_co2eq,
+    fugitivas_ch4_GWP = fugitivas_ch4_GWP,
+    fugitivas_ch4_trans = fugitivas_ch4_trans,
+    fugitivas_co2_trans = fugitivas_co2_trans,
+    fugitivas_n2o_GWP = fugitivas_n2o_GWP,
+    fugitivas_n2o_trans = fugitivas_n2o_trans,
+    total_fugitivas_CO2eq = total_fugitivas_CO2eq,
+    CO2_industrial_trans = CO2_industrial_trans,
+    CH4_industrial_trans = CH4_industrial_trans,
+    N2O_industrial_trans = N2O_industrial_trans,
+    CO2eq_industrial_trans = CO2eq_industrial_trans
   )
+
+  status <<- 'rodado'
+
+  saveRDS(object = resultado, file = 'resultado.rds')
+
+  exportar()
 
   return(resultado)
 

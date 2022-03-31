@@ -15,7 +15,7 @@ app_ui <- function(request) {
       title = "GEE Calc",
       tags$li(class = "dropdown",
               tags$a(href="http://www.epe.gov.br", target="_blank",
-                     tags$img(height = "20px", alt="Logo EPE", src="logo-epe-site.png")
+                     tags$img(height = "20px", alt="Logo EPE", src="https://www.epe.gov.br/PublishingImages/Logos/logo-epe-site.png")
               )
       ),
       leftUi = tagList(
@@ -67,13 +67,25 @@ app_ui <- function(request) {
                 includeMarkdown("instrucoes.md")
         ),
         tabItem(tabName = "tabelas",
-                box(title = "Resultados por setor", width = 12,
-                    textOutput("unidade_setores"),
-                    DTOutput("tabela_DT_setores")
-                ),
-                box(title = "Resultados por combustível", width = 12,
-                    DTOutput("tabela_DT_combustiveis")
-                )),
+                awesomeCheckboxGroup(inputId = 'select_tabelas',
+                                     label = 'Escolha as tabelas a exibir',
+                                     choices = c('Emissões por setor',
+                                                 'Emissões por combustível',
+                                                 'Emissões fugitivas',
+                                                 'Intensidade de emissões na OIE',
+                                                 'Setor industrial'),
+                                     selected = c('Emissões por setor', 'Emissões por combustível'),
+                                     inline = TRUE
+                                     ),
+                uiOutput('download_button'),
+                br(),
+                uiOutput('texto_unidade'),
+                br(),
+                uiOutput(outputId = 'tabela_setores'),
+                uiOutput(outputId = 'tabela_combustiveis'),
+                uiOutput(outputId = 'tabela_fugitivas'),
+                uiOutput(outputId = 'tabela_intensidade'),
+                uiOutput(outputId = 'tabela_industrias')),
         tabItem(tabName = "graficos",
                 box(title = "Resultados por setor",
                     width = 12,
@@ -109,7 +121,7 @@ golem_add_external_resources <- function() {
   )
 
   tags$head(
-    favicon(),
+    favicon(ext = 'png'),
     bundle_resources(
       path = app_sys("app/www"),
       app_title = "DashboardGEE"

@@ -17,6 +17,11 @@ library(shinydashboard)
 library(shinydashboardPlus)
 library(shinyWidgets)
 library(plotly)
+library(purrr)
+library(openxlsx)
+library(shinyFiles)
+
+status <- 'inicio'
 
 fe <- read_excel(
   "fatores_emissao.xlsx",
@@ -46,3 +51,5 @@ GWP_AR5_N2O <- 265
 Setores_formatado <- tibble(setores = c("SIN", "Autoprodução","Setor Energético",
                                         "Residencial", "Comercial", "Público", "Agropecuário", "Transportes",
                                         "Industrial", "Emissões Fugitivas", "Total"))
+
+formato <-  scales::label_comma(accuracy = 0.01, big.mark = '.', decimal.mark = ",")

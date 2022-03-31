@@ -21,10 +21,13 @@ Imports:
     scales,
     rhandsontable,
     DT,
+    shinyFiles,
     shinythemes,
     shinydashboard,
     shinydashboardPlus,
     shinyWidgets,
+    openxlsx,
+    purrr,
     plotly
 Encoding: UTF-8
 LazyData: true
