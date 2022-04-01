@@ -19,9 +19,6 @@ library(shinyWidgets)
 library(plotly)
 library(purrr)
 library(openxlsx)
-library(shinyFiles)
-
-status <- 'inicio'
 
 fe <- read_excel(
   "fatores_emissao.xlsx",
@@ -55,3 +52,5 @@ Setores_formatado <- tibble(setores = c("SIN", "Autoprodução","Setor Energéti
 formato <-  scales::label_comma(accuracy = 0.01, big.mark = '.', decimal.mark = ",")
 
 values <- reactiveValues()
+
+values$status <- 'inicio'

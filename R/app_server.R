@@ -4,6 +4,7 @@
 #'     DO NOT REMOVE.
 #' @import shiny
 #' @noRd
+
 app_server <- function(input, output, session) {
   # Your application server logic
 
@@ -188,7 +189,7 @@ app_server <- function(input, output, session) {
     })
 
     output$download_button <- renderUI({
-      if (status == 'rodado') {
+      if (values$status == 'rodado') {
         downloadButton(outputId = 'download_excel', label = "Exportar resultados para Excel")
       }
     })

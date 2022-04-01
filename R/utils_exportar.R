@@ -7,12 +7,6 @@
 #' Arquivo excel contendo as tabelas úteis organizadas
 #' @noRd
 
-library(openxlsx)
-library(tidyverse)
-library(markdown)
-library(rmarkdown)
-library(htmltools)
-
 exportar <- function(){
 
 resultados <- readRDS('resultado.rds')

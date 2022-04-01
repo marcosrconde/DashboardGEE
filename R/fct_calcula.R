@@ -1051,7 +1051,7 @@ calcula <- function(){
     CO2eq_industrial_trans = CO2eq_industrial_trans
   )
 
-  status <<- 'rodado'
+  values$status <- 'rodado'
 
   saveRDS(object = resultado, file = 'resultado.rds')
 
