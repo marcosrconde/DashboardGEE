@@ -12,14 +12,14 @@ app_server <- function(input, output, session) {
 
     arquivo <- input$entrada
 
-    matrizes <<- read_xlsx(arquivo$datapath) %>%
+    values$matrizes <-  read_xlsx(arquivo$datapath) %>%
       remove_empty(., which = c("rows")) %>%
       clean_names()
 
-    ano_inicio <<- input$ano_inicio
-    ano_fim <<- input$ano_fim
+    values$ano_inicio <- input$ano_inicio
+    values$ano_fim <- input$ano_fim
 
-    anos_decenio <<- tibble(ano = ano_inicio:ano_fim)
+    values$anos_decenio <- tibble(ano = values$ano_inicio:values$ano_fim)
 
     resultado <- calcula()
 
@@ -67,7 +67,7 @@ app_server <- function(input, output, session) {
       n_comb_outros <- 12}
 
       output$ano_selecao <- renderUI({
-        sliderInput("ano_selecionado", "Selecione o ano a exibir:", min = ano_inicio, max = ano_fim, value = ano_inicio, step = 1, ticks = FALSE)
+        sliderInput("ano_selecionado", "Selecione o ano a exibir:", min = values$ano_inicio, max = values$ano_fim, value = values$ano_inicio, step = 1, ticks = FALSE)
       })
 
     output$tabela_setores <- renderUI({
@@ -211,7 +211,7 @@ app_server <- function(input, output, session) {
       theme(legend.position = "bottom", legend.title = element_blank(),
             legend.text = element_text(size = 10), axis.text.x=element_text(size=10, angle = 45, vjust=.5),
             axis.text.y=element_text(size=10))+
-      scale_x_continuous(breaks=seq(ano_inicio, ano_fim, 1))+
+      scale_x_continuous(breaks=seq(values$ano_inicio, values$ano_fim, 1))+
       scale_y_continuous(breaks=seq(0, escala_eixo_y, by=100))+
       scale_fill_brewer(palette="Paired", direction = -1) +
       labs(title="Emissões de gases de efeito estufa", subtitle=txt_unidade, y="Total", x="ano", caption="EPE")
@@ -230,7 +230,7 @@ app_server <- function(input, output, session) {
 
       ano_selecionado <- input$ano_selecionado
 
-      posicao <- (ano_selecionado - ano_inicio + 2)
+      posicao <- (ano_selecionado - values$ano_inicio + 2)
 
       comb_grafico <- grafico_comb[,c(1,posicao)]
 
@@ -281,7 +281,7 @@ app_server <- function(input, output, session) {
         geom_line(colour = "#4f77b8", size = 1)+
         theme_bw()+
         theme(axis.text.x=element_text(size=12, angle = 45, vjust=.5), axis.title.y=element_text(size = 14), plot.title = element_text(size = 14))+
-        scale_x_continuous(breaks=seq(ano_inicio, ano_fim, 1))+
+        scale_x_continuous(breaks=seq(values$ano_inicio, values$ano_fim, 1))+
         labs(title="Intensidade de emissões no consumo de energia", y="kg.CO2eq / tep", x="ano", caption="EPE")
     })
 

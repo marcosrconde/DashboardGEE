@@ -53,3 +53,5 @@ Setores_formatado <- tibble(setores = c("SIN", "Autoprodução","Setor Energéti
                                         "Industrial", "Emissões Fugitivas", "Total"))
 
 formato <-  scales::label_comma(accuracy = 0.01, big.mark = '.', decimal.mark = ",")
+
+values <- reactiveValues()

@@ -16,7 +16,7 @@
 
 calcula <- function(){
 
-  matriz_todas <- matrizes %>%
+  matriz_todas <- values$matrizes %>%
     select(
       -energia_primaria_total,
       -energia_secundaria_total,
@@ -54,7 +54,7 @@ calcula <- function(){
   n_matrizes <- n_linhas / 41
   n_colunas <- n_matrizes + 1
 
-  tryCatch(if(nrow(anos_decenio) != n_matrizes) {
+  tryCatch(if(nrow(values$anos_decenio) != n_matrizes) {
 
     message("número de matrizes não corresponde")
 
@@ -71,7 +71,7 @@ calcula <- function(){
     c(total)
   )
 
-  oferta_interna <- data.frame(anos_decenio, oferta_interna)
+  oferta_interna <- data.frame(values$anos_decenio, oferta_interna)
   names(oferta_interna) <- c("ano", "oie")
 
 
@@ -83,7 +83,7 @@ calcula <- function(){
     c(carvao_vapor)
   )
 
-  producao_carvao <- data.frame(anos_decenio, producao_carvao)
+  producao_carvao <- data.frame(values$anos_decenio, producao_carvao)
   names(producao_carvao) <- c("ano", "carvao_vapor")
 
   # constrói vetor contendo a produção de petroleo
@@ -93,7 +93,7 @@ calcula <- function(){
     c(petroleo)
   )
 
-  producao_petroleo <- data.frame(anos_decenio, producao_petroleo)
+  producao_petroleo <- data.frame(values$anos_decenio, producao_petroleo)
   names(producao_petroleo) <- c("ano", "petroleo")
 
   # constrói vetor contendo a produção de gás natural
@@ -103,7 +103,7 @@ calcula <- function(){
     c(gas_natural)
   )
 
-  producao_gas <- data.frame(anos_decenio, producao_gas)
+  producao_gas <- data.frame(values$anos_decenio, producao_gas)
   names(producao_gas) <- c("ano", "gas")
 
   # constrói vetor contendo a o refino de petróleo
@@ -114,7 +114,7 @@ calcula <- function(){
   ) %>%
     mutate(petroleo = petroleo * -1)
 
-  refino_oleo <- data.frame(anos_decenio, refino_oleo)
+  refino_oleo <- data.frame(values$anos_decenio, refino_oleo)
   names(refino_oleo) <- c("ano", "refino")
 
   # Matrizes com os fatores de emissão --------------------------------------
@@ -180,7 +180,7 @@ calcula <- function(){
 
 
   transporte_oleo <- producao_petroleo + refino_oleo
-  transporte_oleo$ano <- anos_decenio
+  transporte_oleo$ano <- values$anos_decenio
 
   producao_petroleo <- producao_petroleo %>%
     mutate(var2010 = producao_petroleo$petroleo / as.numeric(oleo_2010[1,1]))
@@ -219,33 +219,33 @@ calcula <- function(){
   transporte_oleo$n2o <- transporte_oleo$petroleo * as.numeric(fe_n2o_transporte/1000)
 
 
-  fugitivas_co2 <- cbind(anos_decenio, producao_petroleo$co2, refino_oleo$co2, transporte_oleo$co2, producao_carvao$co2) %>%
+  fugitivas_co2 <- cbind(values$anos_decenio, producao_petroleo$co2, refino_oleo$co2, transporte_oleo$co2, producao_carvao$co2) %>%
     adorn_totals(., c("col"))
   names(fugitivas_co2) <- c("ano", "E&P", "Refino", "Transporte", "Carvão", "Total")
 
 
   fugitivas_co2_trans <- fugitivas_co2 %>%
     transpose(., keep.names = "ano")
-  names(fugitivas_co2_trans) <- c("setores", ano_inicio:ano_fim)
+  names(fugitivas_co2_trans) <- c("setores", values$ano_inicio:values$ano_fim)
 
   fugitivas_co2_trans <- fugitivas_co2_trans[2:5,] %>%
     adorn_totals(where = c("row"), name = "Emissões Fugitivas")
 
 
-  fugitivas_ch4 <- cbind(anos_decenio, producao_petroleo$ch4, refino_oleo$ch4, transporte_oleo$ch4, producao_carvao$ch4)%>%
+  fugitivas_ch4 <- cbind(values$anos_decenio, producao_petroleo$ch4, refino_oleo$ch4, transporte_oleo$ch4, producao_carvao$ch4)%>%
     adorn_totals(., c("col"))
   names(fugitivas_ch4) <- c("ano", "E&P", "Refino", "Transporte", "Carvão", "Total")
 
 
   fugitivas_ch4_trans <- fugitivas_ch4 %>%
     transpose(., keep.names = "ano")
-  names(fugitivas_ch4_trans) <- c("setores", ano_inicio:ano_fim)
+  names(fugitivas_ch4_trans) <- c("setores", values$ano_inicio:values$ano_fim)
 
   fugitivas_ch4_trans <- fugitivas_ch4_trans[2:5,] %>%
     adorn_totals(where = c("row"), name = "Emissões Fugitivas")
 
 
-  fugitivas_n2o <- cbind(anos_decenio, producao_petroleo$n2o, refino_oleo$n2o, transporte_oleo$n2o)%>%
+  fugitivas_n2o <- cbind(values$anos_decenio, producao_petroleo$n2o, refino_oleo$n2o, transporte_oleo$n2o)%>%
     adorn_totals(., c("col"))
   names(fugitivas_n2o) <- c("ano", "E&P", "Refino", "Transporte", "Total")
 
@@ -253,7 +253,7 @@ calcula <- function(){
   fugitivas_n2o_trans <- fugitivas_n2o %>%
     transpose(., keep.names = "ano")
 
-  names(fugitivas_n2o_trans) <- c("setores", ano_inicio:ano_fim)
+  names(fugitivas_n2o_trans) <- c("setores", values$ano_inicio:values$ano_fim)
   fugitivas_n2o_trans <- fugitivas_n2o_trans[2:4,] %>%
     adorn_totals(where = c("row"), name = "Emissões Fugitivas")
 
@@ -315,7 +315,7 @@ calcula <- function(){
     subset(., Total > 0) %>%
     group_by(setores) %>%
     arrange(setores)
-  calculo_co2_matrizes <- data.frame(anos_decenio, calculo_co2_matrizes)
+  calculo_co2_matrizes <- data.frame(values$anos_decenio, calculo_co2_matrizes)
 
   CO2 <- calculo_co2_matrizes %>%
     group_by(ano, setores) %>%
@@ -434,7 +434,7 @@ calcula <- function(){
     subset(., Total > 0) %>%
     group_by(setores) %>%
     arrange(setores)
-  calculo_ch4_matrizes <- data.frame(anos_decenio, calculo_ch4_matrizes)
+  calculo_ch4_matrizes <- data.frame(values$anos_decenio, calculo_ch4_matrizes)
 
   CH4 <- calculo_ch4_matrizes %>%
     group_by(ano, setores) %>%
@@ -564,7 +564,7 @@ calcula <- function(){
     subset(., Total > 0) %>%
     group_by(setores) %>%
     arrange(setores)
-  calculo_n2o_matrizes <- data.frame(anos_decenio, calculo_n2o_matrizes)
+  calculo_n2o_matrizes <- data.frame(values$anos_decenio, calculo_n2o_matrizes)
 
   N2O <- calculo_n2o_matrizes %>%
     group_by(ano, setores) %>%
@@ -687,13 +687,13 @@ calcula <- function(){
 
   CH4_GWP_AR5 <- mutate_if(calculo_ch4_matrizes, is.numeric, ~ . * GWP_AR5_CH4)
   CH4_GWP_AR5$ano <- NULL
-  CH4_GWP_AR5 <- data.frame(anos_decenio,CH4_GWP_AR5)
+  CH4_GWP_AR5 <- data.frame(values$anos_decenio,CH4_GWP_AR5)
 
   # Cálculo de N2O para CO2eq ----------------------------------------------------------
 
   N2O_GWP_AR5 <- mutate_if(calculo_n2o_matrizes, is.numeric, ~ . * GWP_AR5_N2O)
   N2O_GWP_AR5$ano <- NULL
-  N2O_GWP_AR5 <- data.frame(anos_decenio,N2O_GWP_AR5)
+  N2O_GWP_AR5 <- data.frame(values$anos_decenio,N2O_GWP_AR5)
 
 
   # Monta matriz de resultados por setor em CO2eq ---------------------------
@@ -863,7 +863,7 @@ calcula <- function(){
   combustivel_CO2 <- aggregate(calculo_co2_matrizes[,3:28], list(calculo_co2_matrizes$ano), FUN=sum) %>%
     transpose(keep.names = "Group.1")
 
-  names(combustivel_CO2) <- c("Combustível", ano_inicio:ano_fim)
+  names(combustivel_CO2) <- c("Combustível", values$ano_inicio:values$ano_fim)
 
   combustivel_CO2 <- combustivel_CO2 [2:27,] %>%
     adorn_totals(c("row","col")) %>%
@@ -897,7 +897,7 @@ calcula <- function(){
   combustivel_CH4 <- aggregate(calculo_ch4_matrizes[,3:28], list(calculo_ch4_matrizes$ano), FUN=sum) %>%
     transpose(keep.names = "Group.1")
 
-  names(combustivel_CH4) <- c("Combustível", ano_inicio:ano_fim)
+  names(combustivel_CH4) <- c("Combustível", values$ano_inicio:values$ano_fim)
 
   combustivel_CH4 <- combustivel_CH4 [2:27,] %>%
     adorn_totals(c("row","col")) %>%
@@ -936,7 +936,7 @@ calcula <- function(){
   combustivel_N2O <- aggregate(calculo_n2o_matrizes[,3:28], list(calculo_n2o_matrizes$ano), FUN=sum) %>%
     transpose(keep.names = "Group.1")
 
-  names(combustivel_N2O) <- c("Combustível", ano_inicio:ano_fim)
+  names(combustivel_N2O) <- c("Combustível", values$ano_inicio:values$ano_fim)
 
   combustivel_N2O <- combustivel_N2O [2:27,] %>%
     adorn_totals(c("row","col")) %>%
@@ -979,7 +979,7 @@ calcula <- function(){
   combustivel_CO2eq <- aggregate(CO2eq_combustivel[,3:28], list(CO2eq_combustivel$ano), FUN=sum) %>%
     transpose(keep.names = "Group.1")
 
-  names(combustivel_CO2eq) <- c("Combustível", ano_inicio:ano_fim)
+  names(combustivel_CO2eq) <- c("Combustível", values$ano_inicio:values$ano_fim)
 
   combustivel_CO2eq <- combustivel_CO2eq [2:27,] %>%
     adorn_totals(c("row","col")) %>%
