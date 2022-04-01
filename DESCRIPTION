@@ -25,6 +25,8 @@ Imports:
     shinythemes,
     shinydashboard,
     shinydashboardPlus,
+    markdown,
+    rmarkdown,
     shinyWidgets,
     openxlsx,
     purrr,

@@ -2,8 +2,11 @@
 #'
 #' @param request Internal parameter for `{shiny}`.
 #'     DO NOT REMOVE.
-#' @import shiny
+#' @import shiny shinydashboard shinydashboardPlus shinyWidgets markdown
+#'
 #' @noRd
+
+
 app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
