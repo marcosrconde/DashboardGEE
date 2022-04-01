@@ -6,7 +6,7 @@
 #' @description
 #' Lê planilha de fatores de emissões e cria variáveis globais para uso no modelo.
 #'
-#' @import readxl
+#' @import readxl tidyr
 #'
 #' @noRd
 
@@ -15,11 +15,11 @@
 # valores dos fatores de emissão em t.GEE/mil tep
 # na planilha celulas o valor 1 ou -1 representa as células a calcular
 
-fe <- read_excel(
+fe <- readxl::read_excel(
   "fatores_emissao.xlsx",
   sheet = "FE"
 )
-gatilho <- read_excel(
+gatilho <- readxl::read_excel(
   "fatores_emissao.xlsx",
   sheet = "celulas"
 )
@@ -40,7 +40,7 @@ setores <- gatilho [ ,1]
 GWP_AR5_CH4 <- 28
 GWP_AR5_N2O <- 265
 
-Setores_formatado <- tibble(setores = c("SIN", "Autoprodução","Setor Energético",
+Setores_formatado <- tidyr::tibble(setores = c("SIN", "Autoprodução","Setor Energético",
                                         "Residencial", "Comercial", "Público", "Agropecuário", "Transportes",
                                         "Industrial", "Emissões Fugitivas", "Total"))
 

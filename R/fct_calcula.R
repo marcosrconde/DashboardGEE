@@ -13,7 +13,7 @@
 #'planos de energia
 #'
 #'@import dplyr tidyr janitor shiny purrr readxl data.table stringr
-#' @noRd
+
 
 
 calcula <- function(){
