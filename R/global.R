@@ -1,26 +1,19 @@
+#' Global Rscript
+#'
+#' @param request Internal parameter for `{shiny}`.
+#'     DO NOT REMOVE.
+#'
+#' @description
+#' Lê planilha de fatores de emissões e cria variáveis globais para uso no modelo.
+#'
+#' @import readxl
+#'
+#' @noRd
+
+
 # Lê matriz de fatores de emissão e matriz com as células a calcular
 # valores dos fatores de emissão em t.GEE/mil tep
 # na planilha celulas o valor 1 ou -1 representa as células a calcular
-
-library(readxl)
-library(tidyverse)
-library(data.table)
-library(splitstackshape)
-library(janitor)
-library(ggplot2)
-library(scales)
-library(shiny)
-library(rhandsontable)
-library(DT)
-library(shinythemes)
-library(shinydashboard)
-library(markdown)
-library(rmarkdown)
-library(shinydashboardPlus)
-library(shinyWidgets)
-library(plotly)
-library(purrr)
-library(openxlsx)
 
 fe <- read_excel(
   "fatores_emissao.xlsx",

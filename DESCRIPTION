@@ -25,6 +25,7 @@ Imports:
     shinythemes,
     shinydashboard,
     shinydashboardPlus,
+    forcats,
     markdown,
     rmarkdown,
     shinyWidgets,

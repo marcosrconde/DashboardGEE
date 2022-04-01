@@ -11,6 +11,8 @@
 #' @return
 #'Retorna uma lista com as tabelas úteis para análises das emissões de GEE nos
 #'planos de energia
+#'
+#'@import dplyr tidyr janitor shiny purrr readxl data.table stringr
 #' @noRd
 
 
@@ -225,7 +227,7 @@ calcula <- function(){
 
 
   fugitivas_co2_trans <- fugitivas_co2 %>%
-    transpose(., keep.names = "ano")
+    data.table::transpose(., keep.names = "ano")
   names(fugitivas_co2_trans) <- c("setores", values$ano_inicio:values$ano_fim)
 
   fugitivas_co2_trans <- fugitivas_co2_trans[2:5,] %>%
@@ -238,7 +240,7 @@ calcula <- function(){
 
 
   fugitivas_ch4_trans <- fugitivas_ch4 %>%
-    transpose(., keep.names = "ano")
+    data.table::transpose(., keep.names = "ano")
   names(fugitivas_ch4_trans) <- c("setores", values$ano_inicio:values$ano_fim)
 
   fugitivas_ch4_trans <- fugitivas_ch4_trans[2:5,] %>%
@@ -251,7 +253,7 @@ calcula <- function(){
 
 
   fugitivas_n2o_trans <- fugitivas_n2o %>%
-    transpose(., keep.names = "ano")
+    data.table::transpose(., keep.names = "ano")
 
   names(fugitivas_n2o_trans) <- c("setores", values$ano_inicio:values$ano_fim)
   fugitivas_n2o_trans <- fugitivas_n2o_trans[2:4,] %>%
@@ -861,7 +863,7 @@ calcula <- function(){
   # Matriz de combustível para emissão de CO2
 
   combustivel_CO2 <- aggregate(calculo_co2_matrizes[,3:28], list(calculo_co2_matrizes$ano), FUN=sum) %>%
-    transpose(keep.names = "Group.1")
+    data.table::transpose(keep.names = "Group.1")
 
   names(combustivel_CO2) <- c("Combustível", values$ano_inicio:values$ano_fim)
 
@@ -895,7 +897,7 @@ calcula <- function(){
   # Matriz de combustível para emissão de CH4
 
   combustivel_CH4 <- aggregate(calculo_ch4_matrizes[,3:28], list(calculo_ch4_matrizes$ano), FUN=sum) %>%
-    transpose(keep.names = "Group.1")
+    data.table::transpose(keep.names = "Group.1")
 
   names(combustivel_CH4) <- c("Combustível", values$ano_inicio:values$ano_fim)
 
@@ -934,7 +936,7 @@ calcula <- function(){
   # Matriz de combustível para emissão de N2O
 
   combustivel_N2O <- aggregate(calculo_n2o_matrizes[,3:28], list(calculo_n2o_matrizes$ano), FUN=sum) %>%
-    transpose(keep.names = "Group.1")
+    data.table::transpose(keep.names = "Group.1")
 
   names(combustivel_N2O) <- c("Combustível", values$ano_inicio:values$ano_fim)
 
@@ -977,7 +979,7 @@ calcula <- function(){
     group_by(ano)
 
   combustivel_CO2eq <- aggregate(CO2eq_combustivel[,3:28], list(CO2eq_combustivel$ano), FUN=sum) %>%
-    transpose(keep.names = "Group.1")
+    data.table::transpose(keep.names = "Group.1")
 
   names(combustivel_CO2eq) <- c("Combustível", values$ano_inicio:values$ano_fim)
 

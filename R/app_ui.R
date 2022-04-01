@@ -2,7 +2,7 @@
 #'
 #' @param request Internal parameter for `{shiny}`.
 #'     DO NOT REMOVE.
-#' @import shiny shinydashboard shinydashboardPlus shinyWidgets markdown
+#' @import shiny shinydashboardPlus shinydashboard shinyWidgets markdown plotly
 #'
 #' @noRd
 

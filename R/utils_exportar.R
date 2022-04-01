@@ -5,6 +5,8 @@
 #'
 #' @return
 #' Arquivo excel contendo as tabelas úteis organizadas
+#'
+#' @import openxlsx
 #' @noRd
 
 exportar <- function(){

@@ -2,7 +2,8 @@
 #'
 #' @param input,output,session Internal parameters for {shiny}.
 #'     DO NOT REMOVE.
-#' @import shiny
+#' @import shiny janitor shinydashboardPlus shinydashboard DT data.table
+#'  tidyverse ggplot2 plotly readxl dplyr scales forcats
 #' @noRd
 
 app_server <- function(input, output, session) {
